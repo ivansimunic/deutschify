@@ -4,6 +4,7 @@ import TopBar from './components/TopBar'
 import Settings from './components/Settings'
 import Study from './components/Study'
 import Add from './components/Add'
+import Authenticate from './components/Authenticate'
 
 export default function App() {
   const [frame, setFrame] = useState("study")//add, study, settings
@@ -12,9 +13,7 @@ export default function App() {
   
   if (!user)
     return (
-      <div className='h-screen w-screen bg-wood text-paper'>
-        auth
-      </div>
+      <Authenticate />
     )
   
   if (frame === "add")
