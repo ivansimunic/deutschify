@@ -1,17 +1,17 @@
 import { useState } from 'react'
 
 import TopBar from './components/TopBar'
-import Settings from './components/Settings'
 import Study from './components/Study'
 import Add from './components/Add'
 import Authenticate from './components/Authenticate'
 
+import pb from './pocketbaseClient'
+
 export default function App() {
-  const [frame, setFrame] = useState("study")//add, study, settings
-  const [user, setUser] = useState(null)
+  const [frame, setFrame] = useState("study")//add or study
   
   
-  if (!user)
+  if (!pb.authStore.isValid)
     return (
       <Authenticate />
     )
@@ -28,17 +28,8 @@ export default function App() {
     return (
       <div className='h-screen w-screen bg-wood text-paper'>
         <TopBar frame={frame} setFrame={setFrame} />
-        <Study />
+        <Study setFrame={setFrame}/>
       </div>
     )
-    
-  if (frame === "settings")
-    return (    
-      <div className='h-screen w-screen bg-wood text-paper'>
-        <TopBar frame={frame} setFrame={setFrame} />
-        <Settings />
-      </div>
-    )
-  
 
 }

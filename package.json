@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.6.8",
+    "dayjs": "^1.11.10",
     "pocketbase": "^0.21.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "supermemo": "^2.0.17"
   },
   "devDependencies": {
-    "@iconify/tailwind": "^0.1.4",
+    "@egoist/tailwindcss-icons": "^1.7.4",
+    "@iconify/json": "^2.2.193",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@vitejs/plugin-react": "^4.2.1",
