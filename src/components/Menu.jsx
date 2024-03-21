@@ -3,10 +3,15 @@ import pb from "../pocketbaseClient";
 
 export default function Menu({ frame, setFrame }) {
   const [expanded, setExpanded] = useState(false);
-
+  
   function logout() {
     pb.authStore.clear();
     location.reload();
+  }
+  
+  function switchFrame(frame) {
+    setExpanded(false)
+    setFrame(frame)
   }
 
   if (expanded)
@@ -15,10 +20,10 @@ export default function Menu({ frame, setFrame }) {
         <button onClick={() => setExpanded(false)}>
           <span className="i-flowbite-close-outline h-8 w-8 bg-paper" />
         </button>
-        <button onClick={() => setFrame("add")}>
+        <button onClick={() => switchFrame("add")}>
           <span className="i-carbon-add-filled h-6 w-6 bg-paper" />
         </button>
-        <button onClick={() => setFrame("study")}>
+        <button onClick={() => switchFrame("study")}>
           <span className="i-ion-book h-6 w-6 bg-paper" />
         </button>
         <button onClick={logout}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import pb from "../pocketbaseClient";
 import { FSRS, Rating, generatorParameters } from "ts-fsrs";
@@ -6,11 +6,22 @@ import IconButton from "./IconButton";
 
 export default function Study({ setFrame }) {
   const [term, setTerm] = useState("");
-  const [writable, setWritable] = useState(true);
   const [correct, setCorrect] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const [toStudy, setToStudy] = useState(null);
-  const [textColor, setTextColor] = useState("wood")
+  
+  const [failed, setFailed] = useState(false)
+  const [state, setState] = useState("trying")//trying, solutionIncorrect, solutionCorrect
+  
+  const inputRef = useRef()
+  
+  const [textColor, setTextColor] = useState("#1A1818")
+  /*
+    wood: "#1A1818",
+    paper: "#F4E5CE",
+    correct: "#00E6AC",
+    incorrect: "#FF4D4D"
+  */
   
   const params = generatorParameters({ maximum_interval: 1000 });
   const f = new FSRS(params);
@@ -26,19 +37,16 @@ export default function Study({ setFrame }) {
     getEm();
   }, []);
   
-  useEffect(() => {
-    if (writable) setTextColor("wood")
-    else {
-      if (correct) setTextColor("correct")
-      else setTextColor("incorrect")
-    }
-    console.log('new text color:', textColor)
-    
-   }, [correct, writable])
+  useEffect(() => { 
+    if (state === "trying") setTextColor("#1A1818")
+    if (state === "solutionCorrect") setTextColor("#00E6AC")
+    if (state === "solutionIncorrect") setTextColor("#FF4D4D")
+  }, [state])
+
 
   useEffect(() => {
     console.log("The flashcards have changed");
-
+    setFailed(false)
     if (flashcards.length > 0) {
       console.log(
         Date.parse(flashcards[0].dueDate),
@@ -46,33 +54,43 @@ export default function Study({ setFrame }) {
         Date.parse(flashcards[0].dueDate) < Date.now(),
       );
       if (Date.parse(flashcards[0].dueDate) < Date.now()) {
-        setToStudy(flashcards[0]);
+        setToStudy(flashcards[0])
       } else setToStudy(null);
     }
   }, [flashcards]);
+  
+  
+  function handleInput({ target }) { 
+    console.log(target.value)
+    setTerm(target.value)
+    
+    
+  }
+
 
   function check(event) {
     if (event.key === "Enter") {
-      
-      setWritable(false);
-      console.log("writable", writable)
-      console.log('WTF i just fucking set it to false')
-      
-      
       setCorrect(term === toStudy.back);
-      setTerm(toStudy.back);
+      if (term === toStudy.back) {
+        setState("solutionCorrect")
+        inputRef.current.blur()
+      }
+      else {
+        setState("solutionIncorrect")
+        setFailed(true)
+        inputRef.current.blur()
+        setTerm(toStudy.back)
+      }
       console.log("term: ", term);
       playAudio();
-      console.log("writable", writable)
     }
   }
 
   function practice() {
     setTerm("");
-    setWritable(true);
 
     const newSrsData = f.repeat(toStudy.srsData, new Date())[
-      correct ? Rating.Good : Rating.Again
+      failed ? Rating.Again : Rating.Good
     ].card;
 
     let fc = flashcards.map((fc) => fc);
@@ -85,8 +103,18 @@ export default function Study({ setFrame }) {
 
     fc.sort((a, b) => (Date.parse(a.dueDate) > Date.parse(b.dueDate) ? 1 : -1));
     setFlashcards(fc);
-
+    setState("trying")
     console.log(flashcards);
+  }
+  
+  function handleOnFocus() { 
+    if (state === "solutionIncorrect") {
+      setTerm("")
+      setState("trying")
+    } else if (state === "solutionCorrect") { 
+      practice()
+    }
+      
   }
 
   function playAudio() {
@@ -111,25 +139,20 @@ export default function Study({ setFrame }) {
         <p className="mt-2 text-center">{toStudy.type}</p>
       </div>
       <div className="m-14 relative  w-8/12">
-        {!writable ? (
-          <button
-            onClick={practice}
-            className="absolute right-0 m-1 flex h-9 w-9 items-center rounded-full bg-paper"
-          >
-            <span className="i-icon-park-outline-right h-7 w-7 bg-wood pl-9" />
-          </button>
-        ) : (
-          <></>
-        )}
         <input
-          className=" w-full rounded-full bg-paper p-2 text-center text-xl outline-0 text-wood"
+          className="w-full rounded-full bg-paper p-2 text-center text-xl outline-0 text-wood"
+          style={{ color: `${textColor}` }}
+          ref={inputRef}
           type="text"
           value={term}
           onKeyDown={check}
-          onChange={({ target }) => setTerm(target.value)}
+          onChange={handleInput}
+          onFocus={handleOnFocus}
         />
       </div>
-      {!writable && (
+
+      
+      {state !== "trying" && (
         <div className="flex flex-col items-center">
           {toStudy.audio && <IconButton icon="i-lets-icons-sound-max-fill" onClick={ playAudio } />}
           <div className="flex h-96 flex-col items-center overflow-y-auto">
