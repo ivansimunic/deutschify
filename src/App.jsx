@@ -14,7 +14,7 @@ export default function App() {
 
   if (frame === "add")
     return (
-      <div className="h-screen w-screen bg-wood text-paper">
+      <div className="h-full min-h-screen w-screen bg-wood text-paper">
         <TopBar frame={frame} setFrame={setFrame} />
         <Add />
       </div>
@@ -22,7 +22,7 @@ export default function App() {
 
   if (frame === "study")
     return (
-      <div className="h-screen w-screen bg-wood text-paper">
+      <div className="h-full min-h-screen w-screen bg-wood text-paper">
         <TopBar frame={frame} setFrame={setFrame} />
         <Study setFrame={setFrame} />
       </div>

@@ -3,19 +3,17 @@ import { iconsPlugin, getIconCollections } from "@egoist/tailwindcss-icons"
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {
-    },
+    extend: {},
     fontFamily: {
-      sans: ["Philosopher"]
+      sans: ["Philosopher"],
     },
     colors: {
       wood: "#1A1818",
       paper: "#F4E5CE",
+      correct: "#00E6AC",
+      incorrect: "#FF4D4D"
     },
   },
   plugins: [
@@ -29,5 +27,5 @@ export default {
       // and the more recommended way is to use `dynamicIconsPlugin`, see below.
     }),
   ],
-}
+};
 

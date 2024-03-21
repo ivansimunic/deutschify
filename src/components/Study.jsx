@@ -10,7 +10,8 @@ export default function Study({ setFrame }) {
   const [correct, setCorrect] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const [toStudy, setToStudy] = useState(null);
-
+  const [textColor, setTextColor] = useState("wood")
+  
   const params = generatorParameters({ maximum_interval: 1000 });
   const f = new FSRS(params);
 
@@ -24,6 +25,16 @@ export default function Study({ setFrame }) {
     }
     getEm();
   }, []);
+  
+  useEffect(() => {
+    if (writable) setTextColor("wood")
+    else {
+      if (correct) setTextColor("correct")
+      else setTextColor("incorrect")
+    }
+    console.log('new text color:', textColor)
+    
+   }, [correct, writable])
 
   useEffect(() => {
     console.log("The flashcards have changed");
@@ -42,11 +53,17 @@ export default function Study({ setFrame }) {
 
   function check(event) {
     if (event.key === "Enter") {
+      
       setWritable(false);
+      console.log("writable", writable)
+      console.log('WTF i just fucking set it to false')
+      
+      
       setCorrect(term === toStudy.back);
       setTerm(toStudy.back);
       console.log("term: ", term);
       playAudio();
+      console.log("writable", writable)
     }
   }
 
@@ -88,12 +105,12 @@ export default function Study({ setFrame }) {
     );
 
   return (
-    <div className="flex h-full flex-col items-center justify-around">
+    <div className="flex h-screen flex-col items-center justify-center">
       <div className="flex flex-col items-center">
         <p className="text-center text-2xl">{toStudy.meanings}</p>
         <p className="mt-2 text-center">{toStudy.type}</p>
       </div>
-      <div className="fixed top-[18%] w-8/12">
+      <div className="m-14 relative  w-8/12">
         {!writable ? (
           <button
             onClick={practice}
@@ -105,7 +122,7 @@ export default function Study({ setFrame }) {
           <></>
         )}
         <input
-          className="w-full rounded-full bg-paper p-2 text-center text-xl text-wood outline-0"
+          className=" w-full rounded-full bg-paper p-2 text-center text-xl outline-0 text-wood"
           type="text"
           value={term}
           onKeyDown={check}
@@ -113,7 +130,7 @@ export default function Study({ setFrame }) {
         />
       </div>
       {!writable && (
-        <div>
+        <div className="flex flex-col items-center">
           {toStudy.audio && <IconButton icon="i-lets-icons-sound-max-fill" onClick={ playAudio } />}
           <div className="flex h-96 flex-col items-center overflow-y-auto">
             {toStudy.examples.map((e) => (
