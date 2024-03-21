@@ -1,5 +1,5 @@
-import PocketBase from 'pocketbase';
+import PocketBase from "pocketbase";
 
-const pb = new PocketBase('https://backend.deutschify.life');
+const pb = new PocketBase("https://backend.deutschify.life");
 
 export default pb;

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import pb from '../pocketbaseClient'
 import dayjs from 'dayjs'
+import { createEmptyCard } from 'ts-fsrs'
 
 
 export default function Add() {
@@ -12,9 +13,8 @@ export default function Add() {
   
   async function getData() {
     setUploadStatusIcon("i-line-md-loading-loop")
-    const reza = await axios.get(`https://deutschify-backend.fly.dev/api/linguee/${term}`)
-    console.log(reza)
-    setOptions(reza.data.words)
+    const reza = await axios.get(`https://backend.deutschify.life/linguee/${term}`)
+    setOptions(reza.data.words.filter(w => w.audio[0] && w.audio[0].audios[0].version === "German"))
     setUploadStatusIcon("i-octicon-upload-16")
     setTerm(options[selected].term)
   }
@@ -50,9 +50,7 @@ export default function Add() {
       "examples": JSON.stringify(options[selected].translations.map(t => t.examples).flat(Infinity)),
       "dueDate": dayjs(Date.now()).toISOString(),
       "user": pb.authStore.model.id,
-      "interval": 0,
-      "repetition": 0,
-      "efactor": 2.5,
+      "srsData": createEmptyCard(),
     }
     
     await pb.collection('flashcards').create(data)

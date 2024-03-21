@@ -1,17 +1,17 @@
-import { useState } from 'react'
-import pb from '../pocketbaseClient'
+import { useState } from "react";
+import pb from "../pocketbaseClient";
 
 export default function Menu({ frame, setFrame }) {
-  const [expanded, setExpanded] = useState(false)
-  
+  const [expanded, setExpanded] = useState(false);
+
   function logout() {
-    pb.authStore.clear()
-    location.reload()
+    pb.authStore.clear();
+    location.reload();
   }
-  
+
   if (expanded)
     return (
-      <div className='flex flex-col space-y-4'>
+      <div className="flex flex-col space-y-4">
         <button onClick={() => setExpanded(false)}>
           <span className="i-flowbite-close-outline h-8 w-8 bg-paper" />
         </button>
@@ -21,11 +21,11 @@ export default function Menu({ frame, setFrame }) {
         <button onClick={() => setFrame("study")}>
           <span className="i-ion-book h-6 w-6 bg-paper" />
         </button>
-        <button  onClick={logout}>
+        <button onClick={logout}>
           <span className="i-majesticons-logout h-6 w-6 bg-paper" />
         </button>
       </div>
-    )
+    );
   else
     return (
       <div>
@@ -33,5 +33,5 @@ export default function Menu({ frame, setFrame }) {
           <span className="i-bytesize-menu h-8 w-8 bg-paper" />
         </button>
       </div>
-    )
+    );
 }
