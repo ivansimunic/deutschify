@@ -1,1 +1,1 @@
-[demo](deutschify.life)
+[demo](https://deutschify.life)
