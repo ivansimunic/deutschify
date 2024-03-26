@@ -140,6 +140,7 @@ export default function Study({ setFrame }) {
       </div>
       <div className="m-14 relative  w-8/12">
         <input
+          placeholder="Answer..."
           className="w-full rounded-full bg-paper p-2 text-center text-xl outline-0 text-wood"
           style={{ color: `${textColor}` }}
           ref={inputRef}

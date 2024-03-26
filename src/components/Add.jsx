@@ -68,6 +68,7 @@ export default function Add() {
         <></>
         }
         <input
+          placeholder='German word to add...'
           className='bg-paper outline-0 rounded-full text-wood text-center text-xl p-2 w-full'
           type='text' 
           value={term} 
