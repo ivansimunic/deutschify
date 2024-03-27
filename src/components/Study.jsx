@@ -3,44 +3,29 @@ import { useState, useEffect, useRef } from "react";
 import pb from "../pocketbaseClient";
 import { FSRS, Rating, generatorParameters } from "ts-fsrs";
 import IconButton from "./IconButton";
+import { useKeyDown } from "../useKeyDown";
 
-export default function Study({ setFrame }) {
+export default function Study({ setFrame, flashcards, setFlashcards }) {
   const [term, setTerm] = useState("");
-  const [correct, setCorrect] = useState(null);
-  const [flashcards, setFlashcards] = useState([]);
   const [toStudy, setToStudy] = useState(null);
-  
+  const [readyForNext, setReadyForNext] = useState(false)
   const [failed, setFailed] = useState(false)
   const [state, setState] = useState("trying")//trying, solutionIncorrect, solutionCorrect
   
   const inputRef = useRef()
   
-  const [textColor, setTextColor] = useState("#1A1818")
-  /*
-    wood: "#1A1818",
-    paper: "#F4E5CE",
-    correct: "#00E6AC",
-    incorrect: "#FF4D4D"
-  */
+  const [bgColor, setBgColor] = useState("#F4E5CE")
+
   
   const params = generatorParameters({ maximum_interval: 1000 });
   const f = new FSRS(params);
 
-  useEffect(() => {
-    async function getEm() {
-      const f = await pb.collection("flashcards").getFullList({
-        sort: "dueDate",
-      });
-      setFlashcards(f);
-      console.log(f);
-    }
-    getEm();
-  }, []);
+
   
   useEffect(() => { 
-    if (state === "trying") setTextColor("#1A1818")
-    if (state === "solutionCorrect") setTextColor("#00E6AC")
-    if (state === "solutionIncorrect") setTextColor("#FF4D4D")
+    if (state === "trying") setBgColor("#F4E5CE")
+    if (state === "solutionCorrect") setBgColor("#29AB87")
+    if (state === "solutionIncorrect") setBgColor("#CD5C5C")
   }, [state])
 
 
@@ -60,18 +45,42 @@ export default function Study({ setFrame }) {
   }, [flashcards]);
   
   
+  useKeyDown(() => {
+    console.log("rfn", readyForNext)
+    if (readyForNext)
+      next()
+    
+  }, ["Enter"])
+  
   function handleInput({ target }) { 
     console.log(target.value)
     setTerm(target.value)
     
     
   }
+  
+  function getSolution() {
+    
+    if (toStudy.type.slice(0,4) === "noun")
+      console.log('NOUNN')
+      
+      switch (toStudy.type.slice(6)) {
+        case 'masculine':
+          return `der ${toStudy.back}`
+        case 'feminine':
+          return `die ${toStudy.back}`
+        case 'neuter':
+          return `das ${toStudy.back}`
+        case 'plural':
+          return `die ${toStudy.back}`
+      }
+    return toStudy.back
+  }
 
 
   function check(event) {
     if (event.key === "Enter") {
-      setCorrect(term === toStudy.back);
-      if (term === toStudy.back) {
+      if (term === getSolution()) {
         setState("solutionCorrect")
         inputRef.current.blur()
       }
@@ -79,8 +88,11 @@ export default function Study({ setFrame }) {
         setState("solutionIncorrect")
         setFailed(true)
         inputRef.current.blur()
-        setTerm(toStudy.back)
+        setTerm(getSolution())
       }
+      setTimeout(() => {
+        setReadyForNext(true)
+      }, 100)
       console.log("term: ", term);
       playAudio();
     }
@@ -107,15 +119,19 @@ export default function Study({ setFrame }) {
     console.log(flashcards);
   }
   
-  function handleOnFocus() { 
+  function next() { 
     if (state === "solutionIncorrect") {
       setTerm("")
       setState("trying")
     } else if (state === "solutionCorrect") { 
       practice()
     }
+    setReadyForNext(false)
+    
+    inputRef.current.focus()
       
   }
+
 
   function playAudio() {
     const a = new Audio(toStudy.audio);
@@ -142,13 +158,13 @@ export default function Study({ setFrame }) {
         <input
           placeholder="Answer..."
           className="w-full rounded-full bg-paper p-2 text-center text-xl outline-0 text-wood"
-          style={{ color: `${textColor}` }}
+          style={{ 'background-color': `${bgColor}` }}
           ref={inputRef}
           type="text"
           value={term}
           onKeyDown={check}
           onChange={handleInput}
-          onFocus={handleOnFocus}
+          onFocus={next}
         />
       </div>
 
